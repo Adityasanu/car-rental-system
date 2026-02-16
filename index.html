@@ -1,0 +1,2813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DriveNow - Premium Car Reservation System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ===== CSS Variables ===== */
+        :root {
+            /* Colors - Automotive Premium Theme */
+            --primary: #FF6B35;
+            --primary-dark: #E5522E;
+            --primary-light: #FF8456;
+            --secondary: #1A1A2E;
+            --secondary-light: #16213E;
+            --accent: #0F3460;
+            --text-dark: #0A0A0A;
+            --text-light: #F5F5F5;
+            --text-muted: #B8B8B8;
+            --bg-light: #FFFFFF;
+            --bg-dark: #0F0F0F;
+            --card-bg: #FFFFFF;
+            --border: rgba(0, 0, 0, 0.1);
+            --shadow: rgba(0, 0, 0, 0.15);
+            --overlay: rgba(0, 0, 0, 0.7);
+            
+            /* Typography */
+            --font-display: 'Orbitron', sans-serif;
+            --font-body: 'Outfit', sans-serif;
+            
+            /* Spacing */
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 1rem;
+            --spacing-md: 2rem;
+            --spacing-lg: 4rem;
+            --spacing-xl: 6rem;
+            
+            /* Transitions */
+            --transition-fast: 0.2s ease;
+            --transition-base: 0.3s ease;
+            --transition-slow: 0.5s ease;
+        }
+
+        [data-theme="dark"] {
+            --text-dark: #F5F5F5;
+            --text-light: #0A0A0A;
+            --bg-light: #0F0F0F;
+            --bg-dark: #1A1A2E;
+            --card-bg: #16213E;
+            --border: rgba(255, 255, 255, 0.1);
+            --shadow: rgba(255, 255, 255, 0.1);
+        }
+
+        /* ===== Reset & Base ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        /* ===== Navigation ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-light);
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+            transition: all var(--transition-base);
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        [data-theme="dark"] .navbar {
+            background: rgba(15, 15, 15, 0.95);
+        }
+
+        .navbar.scrolled {
+            box-shadow: 0 4px 20px var(--shadow);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.2rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        .nav-brand i {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+
+        .nav-brand strong {
+            color: var(--primary);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-dark);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color var(--transition-fast);
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width var(--transition-base);
+        }
+
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
+        }
+
+        .login-btn, .register-btn {
+            padding: 0.6rem 1.5rem;
+            border-radius: 50px;
+            transition: all var(--transition-base);
+        }
+
+        .login-btn {
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .login-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .register-btn {
+            background: var(--primary);
+            color: white;
+            border: 2px solid var(--primary);
+        }
+
+        .register-btn:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .user-menu {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .user-name {
+            font-weight: 600;
+            padding: 0.6rem 1.5rem;
+            background: var(--accent);
+            color: white;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .user-name::after {
+            content: '\f0d7';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 1rem;
+            background: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 10px 40px var(--shadow);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all var(--transition-base);
+        }
+
+        .user-menu:hover .dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-link {
+            display: block;
+            padding: 1rem 1.5rem;
+            color: var(--text-dark);
+            text-decoration: none;
+            transition: all var(--transition-fast);
+        }
+
+        .dropdown-link:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .dropdown-link:first-child {
+            border-radius: 10px 10px 0 0;
+        }
+
+        .dropdown-link:last-child {
+            border-radius: 0 0 10px 10px;
+        }
+
+        .nav-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .nav-toggle span {
+            width: 25px;
+            height: 3px;
+            background: var(--text-dark);
+            border-radius: 3px;
+            transition: all var(--transition-base);
+        }
+
+        /* ===== Hero Section ===== */
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            padding-top: 80px;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--accent) 100%);
+            opacity: 0.05;
+        }
+
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, var(--primary) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, var(--accent) 0%, transparent 50%);
+            opacity: 0.3;
+            animation: heroGradient 15s ease infinite;
+        }
+
+        @keyframes heroGradient {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(180deg); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: 5rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+
+        .title-line {
+            display: block;
+            animation: slideInLeft 0.8s ease backwards;
+        }
+
+        .title-line:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .title-line:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        .title-line.highlight {
+            color: var(--primary);
+            position: relative;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            max-width: 600px;
+            animation: fadeIn 1s ease 0.6s backwards;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1.5rem;
+            animation: fadeIn 1s ease 0.8s backwards;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 4rem;
+            margin-top: 4rem;
+            animation: fadeIn 1s ease 1s backwards;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        /* ===== Buttons ===== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-family: var(--font-body);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-dark);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-block {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .back-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            transition: all var(--transition-fast);
+        }
+
+        .back-btn:hover {
+            color: var(--primary);
+            transform: translateX(-5px);
+        }
+
+        /* ===== Sections ===== */
+        .section {
+            padding: var(--spacing-xl) 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+        }
+
+        /* ===== Featured Cars ===== */
+        .featured-cars {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .car-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px var(--shadow);
+            transition: all var(--transition-base);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .car-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transform: scaleX(0);
+            transition: transform var(--transition-base);
+        }
+
+        .car-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .car-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px var(--shadow);
+        }
+
+        .car-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+        }
+
+        .car-info {
+            padding: 1.5rem;
+        }
+
+        .car-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .car-name {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .car-type {
+            background: var(--primary);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .car-features {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .car-features span {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .car-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .car-price {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--primary);
+        }
+
+        .car-price span {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-family: var(--font-body);
+        }
+
+        .car-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            color: #FFA500;
+        }
+
+        /* ===== Features Grid ===== */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 20px;
+            text-align: center;
+            transition: all var(--transition-base);
+            border: 2px solid transparent;
+        }
+
+        .feature-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px var(--shadow);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .feature-card h3 {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        /* ===== Filters ===== */
+        .filters-container {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .filter-group label {
+            display: flex;
+            align-items: center;
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 50px;
+            padding: 0.8rem 1.5rem;
+            transition: all var(--transition-fast);
+        }
+
+        .filter-group label:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        .filter-group i {
+            color: var(--text-muted);
+            margin-right: 0.8rem;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            flex: 1;
+            border: none;
+            background: transparent;
+            color: var(--text-dark);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .filter-group select {
+            cursor: pointer;
+            padding: 0.8rem 1.5rem;
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 50px;
+            transition: all var(--transition-fast);
+        }
+
+        .filter-group select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        /* ===== Cars Grid ===== */
+        .cars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        /* ===== Car Details ===== */
+        .details-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .details-image {
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px var(--shadow);
+        }
+
+        .details-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .details-info h2 {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .details-meta {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        .meta-item i {
+            color: var(--primary);
+        }
+
+        .details-specs {
+            margin-bottom: 2rem;
+        }
+
+        .details-specs h3 {
+            font-family: var(--font-display);
+            margin-bottom: 1rem;
+        }
+
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .spec-item {
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .spec-item i {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .booking-form {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px var(--shadow);
+        }
+
+        .booking-form h3 {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-family: var(--font-body);
+            font-size: 1rem;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            transition: all var(--transition-fast);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .driver-option {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .driver-option label {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .driver-option input[type="radio"] {
+            display: none;
+        }
+
+        .driver-option input[type="radio"]:checked + label {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .booking-summary {
+            background: var(--accent);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .summary-row:last-child {
+            border: none;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        /* ===== Dashboard ===== */
+        .bookings-container {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .booking-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 5px 20px var(--shadow);
+            display: grid;
+            grid-template-columns: 200px 1fr auto;
+            gap: 2rem;
+            align-items: center;
+            transition: all var(--transition-base);
+        }
+
+        .booking-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 10px 30px var(--shadow);
+        }
+
+        .booking-image {
+            border-radius: 10px;
+            overflow: hidden;
+            height: 150px;
+        }
+
+        .booking-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .booking-details h3 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .booking-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .info-item i {
+            color: var(--primary);
+        }
+
+        .booking-status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .status-confirmed {
+            background: #10b981;
+            color: white;
+        }
+
+        .status-pending {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .booking-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .booking-actions button {
+            padding: 0.6rem 1.5rem;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .btn-edit {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: var(--secondary);
+        }
+
+        .btn-cancel {
+            background: transparent;
+            color: #ef4444;
+            border: 2px solid #ef4444;
+        }
+
+        .btn-cancel:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* ===== Payment ===== */
+        .payment-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .payment-summary {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px var(--shadow);
+            height: fit-content;
+        }
+
+        .payment-summary h3 {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .payment-form-container {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px var(--shadow);
+        }
+
+        .payment-form-container h3 {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* ===== Modals ===== */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-base);
+        }
+
+        .modal:not(.hidden) {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--overlay);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            position: relative;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.4s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: transparent;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .modal-close:hover {
+            color: var(--primary);
+            transform: rotate(90deg);
+        }
+
+        .auth-form h2 {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-subtitle {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .auth-switch {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--text-muted);
+        }
+
+        .auth-switch a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-switch a:hover {
+            text-decoration: underline;
+        }
+
+        /* ===== Success Modal ===== */
+        .success-modal {
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .success-animation {
+            margin-bottom: 2rem;
+        }
+
+        .success-checkmark {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .check-icon {
+            width: 100px;
+            height: 100px;
+            position: relative;
+            border-radius: 50%;
+            box-sizing: content-box;
+            border: 4px solid #10b981;
+        }
+
+        .icon-line {
+            height: 5px;
+            background-color: #10b981;
+            display: block;
+            border-radius: 2px;
+            position: absolute;
+            z-index: 10;
+        }
+
+        .line-tip {
+            top: 46px;
+            left: 14px;
+            width: 25px;
+            transform: rotate(45deg);
+            animation: checkTip 0.75s;
+        }
+
+        .line-long {
+            top: 38px;
+            right: 8px;
+            width: 47px;
+            transform: rotate(-45deg);
+            animation: checkLong 0.75s;
+        }
+
+        .icon-circle {
+            top: -4px;
+            left: -4px;
+            z-index: 10;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            position: absolute;
+            box-sizing: content-box;
+            border: 4px solid rgba(16, 185, 129, 0.5);
+        }
+
+        .icon-fix {
+            top: 8px;
+            width: 5px;
+            left: 26px;
+            z-index: 1;
+            height: 85px;
+            position: absolute;
+            transform: rotate(-45deg);
+            background-color: var(--card-bg);
+        }
+
+        @keyframes checkTip {
+            0% { width: 0; left: 1px; top: 19px; }
+            54% { width: 0; left: 1px; top: 19px; }
+            70% { width: 50px; left: -8px; top: 37px; }
+            84% { width: 17px; left: 21px; top: 48px; }
+            100% { width: 25px; left: 14px; top: 45px; }
+        }
+
+        @keyframes checkLong {
+            0% { width: 0; right: 46px; top: 54px; }
+            65% { width: 0; right: 46px; top: 54px; }
+            84% { width: 55px; right: 0; top: 35px; }
+            100% { width: 47px; right: 8px; top: 38px; }
+        }
+
+        .success-modal h2 {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #10b981;
+        }
+
+        /* ===== Footer ===== */
+        .footer {
+            background: var(--secondary);
+            color: var(--text-light);
+            padding: var(--spacing-lg) 0 var(--spacing-md);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-brand {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-brand i {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+
+        .footer-section p {
+            color: var(--text-muted);
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section h4 {
+            font-family: var(--font-display);
+            margin-bottom: 1rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-section ul li a,
+        .footer-section ul li {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color var(--transition-fast);
+        }
+
+        .footer-section ul li a:hover {
+            color: var(--primary);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            transition: all var(--transition-base);
+        }
+
+        .social-links a:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .newsletter-form {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .newsletter-form input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border: none;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+        }
+
+        .newsletter-form button {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 50px;
+            background: var(--primary);
+            color: white;
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .newsletter-form button:hover {
+            background: var(--primary-dark);
+        }
+
+        .footer-bottom {
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        /* ===== Dark Mode Toggle ===== */
+        .dark-mode-toggle {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(255, 107, 53, 0.4);
+            transition: all var(--transition-base);
+            z-index: 100;
+        }
+
+        .dark-mode-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 30px rgba(255, 107, 53, 0.6);
+        }
+
+        /* ===== Loading Overlay ===== */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--overlay);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===== Utility Classes ===== */
+        .hidden {
+            display: none !important;
+        }
+
+        /* ===== Animations ===== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* ===== Responsive Design ===== */
+        @media (max-width: 1024px) {
+            .details-content,
+            .payment-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .booking-card {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .booking-image {
+                margin: 0 auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-toggle {
+                display: flex;
+            }
+            
+            .nav-menu {
+                position: fixed;
+                top: 80px;
+                left: 0;
+                right: 0;
+                background: var(--bg-light);
+                flex-direction: column;
+                padding: 2rem;
+                box-shadow: 0 10px 30px var(--shadow);
+                transform: translateY(-100%);
+                opacity: 0;
+                visibility: hidden;
+                transition: all var(--transition-base);
+            }
+            
+            .nav-menu.active {
+                transform: translateY(0);
+                opacity: 1;
+                visibility: visible;
+            }
+            
+            .hero-title {
+                font-size: 3rem;
+            }
+            
+            .hero-stats {
+                flex-direction: column;
+                gap: 2rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .featured-cars,
+            .cars-grid,
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filters-container {
+                flex-direction: column;
+            }
+            
+            .booking-actions {
+                flex-direction: row;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .modal-content {
+                padding: 2rem;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-car-side"></i>
+                <span>Drive<strong>Now</strong></span>
+            </div>
+            <div class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="#home" class="nav-link active">Home</a></li>
+                <li><a href="#cars" class="nav-link">Fleet</a></li>
+                <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+                <li class="auth-links">
+                    <a href="#login" class="nav-link login-btn">Login</a>
+                    <a href="#register" class="nav-link register-btn">Sign Up</a>
+                </li>
+                <li class="user-menu hidden">
+                    <span class="user-name"></span>
+                    <div class="dropdown">
+                        <a href="#dashboard" class="dropdown-link">My Bookings</a>
+                        <a href="#" class="dropdown-link logout-btn">Logout</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Home Section -->
+    <section id="home" class="section hero-section">
+        <div class="hero-bg"></div>
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    <span class="title-line">Drive Your</span>
+                    <span class="title-line highlight">Dream Car</span>
+                    <span class="title-line">Today</span>
+                </h1>
+                <p class="hero-subtitle">Premium car rental experience with the finest fleet at your fingertips</p>
+                <div class="hero-actions">
+                    <a href="#cars" class="btn btn-primary">
+                        <span>Explore Fleet</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <a href="#how-it-works" class="btn btn-secondary">
+                        <span>Learn More</span>
+                    </a>
+                </div>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <div class="stat-number">500+</div>
+                    <div class="stat-label">Premium Cars</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">50K+</div>
+                    <div class="stat-label">Happy Customers</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Support</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Cars Section -->
+    <section class="section featured-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Featured Fleet</h2>
+                <p class="section-subtitle">Handpicked premium vehicles for your journey</p>
+            </div>
+            <div class="featured-cars" id="featuredCars"></div>
+        </div>
+    </section>
+
+    <!-- Why Choose Us Section -->
+    <section id="how-it-works" class="section features-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Why Choose DriveNow</h2>
+                <p class="section-subtitle">Experience the difference with our premium service</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Fully Insured</h3>
+                    <p>Comprehensive coverage for complete peace of mind during your journey</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3>Flexible Booking</h3>
+                    <p>Book, modify, or cancel anytime with our hassle-free reservation system</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3>24/7 Support</h3>
+                    <p>Round-the-clock assistance whenever you need help on the road</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h3>Premium Fleet</h3>
+                    <p>Access to the latest models from top automotive brands worldwide</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </div>
+                    <h3>Multiple Locations</h3>
+                    <p>Pick up and drop off at convenient locations across the city</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <h3>Best Prices</h3>
+                    <p>Competitive rates with no hidden fees or surprise charges</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cars Listing Section -->
+    <section id="cars" class="section cars-section hidden">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Our Fleet</h2>
+                <p class="section-subtitle">Browse and book your perfect ride</p>
+            </div>
+            
+            <!-- Filters -->
+            <div class="filters-container">
+                <div class="filter-group">
+                    <label>
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search by car name...">
+                    </label>
+                </div>
+                <div class="filter-group">
+                    <select id="typeFilter">
+                        <option value="">All Types</option>
+                        <option value="SUV">SUV</option>
+                        <option value="Sedan">Sedan</option>
+                        <option value="Sports">Sports</option>
+                        <option value="Luxury">Luxury</option>
+                        <option value="Hatchback">Hatchback</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <select id="priceFilter">
+                        <option value="">All Prices</option>
+                        <option value="0-100">Under $100</option>
+                        <option value="100-200">$100 - $200</option>
+                        <option value="200-500">$200 - $500</option>
+                        <option value="500+">$500+</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Cars Grid -->
+            <div class="cars-grid" id="carsGrid"></div>
+        </div>
+    </section>
+
+    <!-- Car Details / Booking Section -->
+    <section id="car-details" class="section details-section hidden">
+        <div class="container">
+            <button class="back-btn" onclick="showSection('cars')">
+                <i class="fas fa-arrow-left"></i> Back to Fleet
+            </button>
+            <div class="details-content" id="carDetailsContent"></div>
+        </div>
+    </section>
+
+    <!-- Booking Dashboard -->
+    <section id="dashboard" class="section dashboard-section hidden">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">My Bookings</h2>
+                <p class="section-subtitle">Manage your car reservations</p>
+            </div>
+            <div class="bookings-container" id="bookingsContainer"></div>
+        </div>
+    </section>
+
+    <!-- Payment Section -->
+    <section id="payment" class="section payment-section hidden">
+        <div class="container">
+            <button class="back-btn" onclick="showSection('car-details')">
+                <i class="fas fa-arrow-left"></i> Back to Details
+            </button>
+            <div class="payment-content">
+                <div class="payment-summary" id="paymentSummary"></div>
+                <div class="payment-form-container">
+                    <h3>Payment Details</h3>
+                    <form id="paymentForm" class="payment-form">
+                        <div class="form-group">
+                            <label>Card Number</label>
+                            <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Card Holder Name</label>
+                            <input type="text" id="cardHolder" placeholder="John Doe" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Expiry Date</label>
+                                <input type="text" id="expiryDate" placeholder="MM/YY" maxlength="5" required>
+                            </div>
+                            <div class="form-group">
+                                <label>CVV</label>
+                                <input type="text" id="cvv" placeholder="123" maxlength="3" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-lock"></i> Complete Payment
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content auth-modal">
+            <button class="modal-close" onclick="closeAuthModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <!-- Login Form -->
+            <div id="loginForm" class="auth-form">
+                <h2>Welcome Back</h2>
+                <p class="auth-subtitle">Sign in to continue your journey</p>
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="loginEmail" placeholder="your@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" placeholder="Enter password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+                </form>
+                <p class="auth-switch">
+                    Don't have an account? <a href="#" onclick="toggleAuthForm()">Sign Up</a>
+                </p>
+            </div>
+
+            <!-- Register Form -->
+            <div id="registerForm" class="auth-form hidden">
+                <h2>Create Account</h2>
+                <p class="auth-subtitle">Join DriveNow today</p>
+                <form onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="registerName" placeholder="John Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="registerEmail" placeholder="your@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="registerPassword" placeholder="Create password" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <input type="password" id="registerConfirmPassword" placeholder="Confirm password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+                </form>
+                <p class="auth-switch">
+                    Already have an account? <a href="#" onclick="toggleAuthForm()">Sign In</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content success-modal">
+            <div class="success-animation">
+                <div class="success-checkmark">
+                    <div class="check-icon">
+                        <span class="icon-line line-tip"></span>
+                        <span class="icon-line line-long"></span>
+                        <div class="icon-circle"></div>
+                        <div class="icon-fix"></div>
+                    </div>
+                </div>
+            </div>
+            <h2>Booking Confirmed!</h2>
+            <p id="successMessage"></p>
+            <button class="btn btn-primary" onclick="closeSuccessModal()">View My Bookings</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-brand">
+                        <i class="fas fa-car-side"></i>
+                        <span>Drive<strong>Now</strong></span>
+                    </div>
+                    <p>Premium car rental experience with the finest fleet at your fingertips.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#cars">Fleet</a></li>
+                        <li><a href="#how-it-works">How It Works</a></li>
+                        <li><a href="#dashboard">My Bookings</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact Us</h4>
+                    <ul>
+                        <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                        <li><i class="fas fa-envelope"></i> hello@drivenow.com</li>
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Auto Street, CA 90210</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Newsletter</h4>
+                    <p>Subscribe for exclusive offers</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Your email">
+                        <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                    </form>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 DriveNow. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Dark Mode Toggle -->
+    <button class="dark-mode-toggle" id="darkModeToggle">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay hidden" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <script>
+        // ===== Data Storage =====
+        const carsData = [
+            {
+                id: 1,
+                name: 'Tesla Model S',
+                type: 'Luxury',
+                price: 299,
+                image: 'https://images.unsplash.com/photo-1617788138017-80ad40651399?w=800',
+                rating: 4.9,
+                seats: 5,
+                transmission: 'Automatic',
+                fuel: 'Electric',
+                description: 'Premium electric sedan with autopilot and ludicrous mode'
+            },
+            {
+                id: 2,
+                name: 'BMW X5',
+                type: 'SUV',
+                price: 249,
+                image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800',
+                rating: 4.8,
+                seats: 7,
+                transmission: 'Automatic',
+                fuel: 'Diesel',
+                description: 'Luxury SUV with spacious interior and advanced features'
+            },
+            {
+                id: 3,
+                name: 'Porsche 911',
+                type: 'Sports',
+                price: 599,
+                image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800',
+                rating: 5.0,
+                seats: 2,
+                transmission: 'Manual',
+                fuel: 'Petrol',
+                description: 'Iconic sports car with breathtaking performance'
+            },
+            {
+                id: 4,
+                name: 'Mercedes E-Class',
+                type: 'Sedan',
+                price: 199,
+                image: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800',
+                rating: 4.7,
+                seats: 5,
+                transmission: 'Automatic',
+                fuel: 'Petrol',
+                description: 'Elegant sedan combining luxury and performance'
+            },
+            {
+                id: 5,
+                name: 'Range Rover Sport',
+                type: 'SUV',
+                price: 349,
+                image: 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800',
+                rating: 4.8,
+                seats: 5,
+                transmission: 'Automatic',
+                fuel: 'Diesel',
+                description: 'Premium SUV with off-road capabilities'
+            },
+            {
+                id: 6,
+                name: 'Audi A4',
+                type: 'Sedan',
+                price: 159,
+                image: 'https://images.unsplash.com/photo-1614162692292-7ac56d7f3c92?w=800',
+                rating: 4.6,
+                seats: 5,
+                transmission: 'Automatic',
+                fuel: 'Petrol',
+                description: 'Sophisticated sedan with cutting-edge technology'
+            },
+            {
+                id: 7,
+                name: 'Honda Civic',
+                type: 'Hatchback',
+                price: 89,
+                image: 'https://images.unsplash.com/photo-1590362891991-f776e747a588?w=800',
+                rating: 4.5,
+                seats: 5,
+                transmission: 'Manual',
+                fuel: 'Petrol',
+                description: 'Reliable and efficient compact car'
+            },
+            {
+                id: 8,
+                name: 'Lamborghini Huracan',
+                type: 'Sports',
+                price: 899,
+                image: 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=800',
+                rating: 5.0,
+                seats: 2,
+                transmission: 'Automatic',
+                fuel: 'Petrol',
+                description: 'Supercar with extreme performance and style'
+            },
+            {
+                id: 9,
+                name: 'Toyota Camry',
+                type: 'Sedan',
+                price: 99,
+                image: 'https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=800',
+                rating: 4.4,
+                seats: 5,
+                transmission: 'Automatic',
+                fuel: 'Hybrid',
+                description: 'Dependable hybrid sedan for everyday driving'
+            },
+            {
+                id: 10,
+                name: 'Jeep Wrangler',
+                type: 'SUV',
+                price: 179,
+                image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=800',
+                rating: 4.7,
+                seats: 5,
+                transmission: 'Manual',
+                fuel: 'Diesel',
+                description: 'Rugged SUV built for adventure'
+            },
+            {
+                id: 11,
+                name: 'Ford Mustang',
+                type: 'Sports',
+                price: 279,
+                image: 'https://images.unsplash.com/photo-1584345604476-8ec5f5195a9c?w=800',
+                rating: 4.8,
+                seats: 4,
+                transmission: 'Automatic',
+                fuel: 'Petrol',
+                description: 'American muscle car with iconic design'
+            },
+            {
+                id: 12,
+                name: 'Volkswagen Golf',
+                type: 'Hatchback',
+                price: 79,
+                image: 'https://images.unsplash.com/photo-1622353219448-46a0e0888d9d?w=800',
+                rating: 4.3,
+                seats: 5,
+                transmission: 'Manual',
+                fuel: 'Petrol',
+                description: 'Versatile hatchback perfect for city driving'
+            }
+        ];
+
+        // ===== State Management =====
+        let currentUser = null;
+        let currentCar = null;
+        let currentBooking = null;
+        let filteredCars = [...carsData];
+
+        // ===== Initialize App =====
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeApp();
+        });
+
+        function initializeApp() {
+            // Check for logged in user
+            const userData = localStorage.getItem('currentUser');
+            if (userData) {
+                currentUser = JSON.parse(userData);
+                updateAuthUI();
+            }
+            
+            // Initialize data
+            if (!localStorage.getItem('users')) {
+                localStorage.setItem('users', JSON.stringify([]));
+            }
+            if (!localStorage.getItem('bookings')) {
+                localStorage.setItem('bookings', JSON.stringify([]));
+            }
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Load initial content
+            renderFeaturedCars();
+            
+            // Setup navigation
+            handleNavigation();
+            
+            // Dark mode
+            const darkMode = localStorage.getItem('darkMode');
+            if (darkMode === 'true') {
+                document.body.setAttribute('data-theme', 'dark');
+                document.getElementById('darkModeToggle').innerHTML = '<i class="fas fa-sun"></i>';
+            }
+        }
+
+        // ===== Event Listeners =====
+        function setupEventListeners() {
+            // Navigation toggle
+            const navToggle = document.getElementById('navToggle');
+            const navMenu = document.getElementById('navMenu');
+            navToggle.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+            });
+            
+            // Navigation links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    const href = e.target.getAttribute('href');
+                    if (href && href.startsWith('#')) {
+                        e.preventDefault();
+                        const section = href.substring(1);
+                        
+                        if (section === 'login' || section === 'register') {
+                            openAuthModal(section);
+                        } else {
+                            showSection(section);
+                        }
+                        
+                        // Update active state
+                        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                        e.target.classList.add('active');
+                        
+                        // Close mobile menu
+                        navMenu.classList.remove('active');
+                    }
+                });
+            });
+            
+            // Logout
+            document.querySelector('.logout-btn')?.addEventListener('click', handleLogout);
+            
+            // Filters
+            document.getElementById('searchInput')?.addEventListener('input', filterCars);
+            document.getElementById('typeFilter')?.addEventListener('change', filterCars);
+            document.getElementById('priceFilter')?.addEventListener('change', filterCars);
+            
+            // Payment form
+            document.getElementById('paymentForm')?.addEventListener('submit', handlePayment);
+            
+            // Card number formatting
+            document.getElementById('cardNumber')?.addEventListener('input', formatCardNumber);
+            document.getElementById('expiryDate')?.addEventListener('input', formatExpiryDate);
+            document.getElementById('cvv')?.addEventListener('input', formatCVV);
+            
+            // Dark mode toggle
+            document.getElementById('darkModeToggle')?.addEventListener('click', toggleDarkMode);
+            
+            // Navbar scroll effect
+            window.addEventListener('scroll', () => {
+                const navbar = document.getElementById('navbar');
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+        }
+
+        // ===== Navigation =====
+        function handleNavigation() {
+            const hash = window.location.hash.substring(1);
+            if (hash && hash !== 'login' && hash !== 'register') {
+                showSection(hash);
+            }
+        }
+
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Show requested section
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            
+            // Load section-specific content
+            if (sectionId === 'cars') {
+                renderAllCars();
+            } else if (sectionId === 'dashboard') {
+                if (!currentUser) {
+                    openAuthModal('login');
+                    return;
+                }
+                renderBookings();
+            }
+            
+            // Update URL
+            window.location.hash = sectionId;
+        }
+
+        // ===== Authentication =====
+        function openAuthModal(type) {
+            const modal = document.getElementById('authModal');
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            
+            modal.classList.remove('hidden');
+            
+            if (type === 'login') {
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+            } else {
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
+            }
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.add('hidden');
+        }
+
+        function toggleAuthForm() {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            
+            loginForm.classList.toggle('hidden');
+            registerForm.classList.toggle('hidden');
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const user = users.find(u => u.email === email && u.password === password);
+            
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                updateAuthUI();
+                closeAuthModal();
+                showNotification('Welcome back, ' + user.name + '!', 'success');
+            } else {
+                showNotification('Invalid email or password', 'error');
+            }
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                showNotification('Passwords do not match', 'error');
+                return;
+            }
+            
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            
+            if (users.find(u => u.email === email)) {
+                showNotification('Email already registered', 'error');
+                return;
+            }
+            
+            const newUser = {
+                id: Date.now(),
+                name,
+                email,
+                password
+            };
+            
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            currentUser = newUser;
+            localStorage.setItem('currentUser', JSON.stringify(newUser));
+            
+            updateAuthUI();
+            closeAuthModal();
+            showNotification('Account created successfully!', 'success');
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            updateAuthUI();
+            showSection('home');
+            showNotification('Logged out successfully', 'success');
+        }
+
+        function updateAuthUI() {
+            const authLinks = document.querySelector('.auth-links');
+            const userMenu = document.querySelector('.user-menu');
+            
+            if (currentUser) {
+                authLinks.classList.add('hidden');
+                userMenu.classList.remove('hidden');
+                document.querySelector('.user-name').textContent = currentUser.name;
+            } else {
+                authLinks.classList.remove('hidden');
+                userMenu.classList.add('hidden');
+            }
+        }
+
+        // ===== Cars Display =====
+        function renderFeaturedCars() {
+            const container = document.getElementById('featuredCars');
+            const featured = carsData.slice(0, 6);
+            
+            container.innerHTML = featured.map(car => createCarCard(car)).join('');
+        }
+
+        function renderAllCars() {
+            const container = document.getElementById('carsGrid');
+            container.innerHTML = filteredCars.map(car => createCarCard(car)).join('');
+        }
+
+        function createCarCard(car) {
+            return `
+                <div class="car-card" onclick="showCarDetails(${car.id})">
+                    <img src="${car.image}" alt="${car.name}" class="car-image">
+                    <div class="car-info">
+                        <div class="car-header">
+                            <h3 class="car-name">${car.name}</h3>
+                            <span class="car-type">${car.type}</span>
+                        </div>
+                        <div class="car-features">
+                            <span><i class="fas fa-users"></i> ${car.seats} Seats</span>
+                            <span><i class="fas fa-cog"></i> ${car.transmission}</span>
+                            <span><i class="fas fa-gas-pump"></i> ${car.fuel}</span>
+                        </div>
+                        <div class="car-footer">
+                            <div class="car-price">
+                                $${car.price}<span>/day</span>
+                            </div>
+                            <div class="car-rating">
+                                <i class="fas fa-star"></i> ${car.rating}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ===== Filters =====
+        function filterCars() {
+            const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
+            const typeFilter = document.getElementById('typeFilter')?.value || '';
+            const priceFilter = document.getElementById('priceFilter')?.value || '';
+            
+            filteredCars = carsData.filter(car => {
+                const matchesSearch = car.name.toLowerCase().includes(searchTerm);
+                const matchesType = !typeFilter || car.type === typeFilter;
+                
+                let matchesPrice = true;
+                if (priceFilter) {
+                    if (priceFilter === '0-100') {
+                        matchesPrice = car.price < 100;
+                    } else if (priceFilter === '100-200') {
+                        matchesPrice = car.price >= 100 && car.price < 200;
+                    } else if (priceFilter === '200-500') {
+                        matchesPrice = car.price >= 200 && car.price < 500;
+                    } else if (priceFilter === '500+') {
+                        matchesPrice = car.price >= 500;
+                    }
+                }
+                
+                return matchesSearch && matchesType && matchesPrice;
+            });
+            
+            renderAllCars();
+        }
+
+        // ===== Car Details =====
+        function showCarDetails(carId) {
+            currentCar = carsData.find(car => car.id === carId);
+            if (!currentCar) return;
+            
+            const container = document.getElementById('carDetailsContent');
+            
+            container.innerHTML = `
+                <div class="details-image">
+                    <img src="${currentCar.image}" alt="${currentCar.name}">
+                </div>
+                <div class="details-info">
+                    <h2>${currentCar.name}</h2>
+                    <div class="details-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-star"></i>
+                            <span>${currentCar.rating} Rating</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-tag"></i>
+                            <span>${currentCar.type}</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-dollar-sign"></i>
+                            <span>$${currentCar.price}/day</span>
+                        </div>
+                    </div>
+                    
+                    <div class="details-specs">
+                        <h3>Specifications</h3>
+                        <div class="specs-grid">
+                            <div class="spec-item">
+                                <i class="fas fa-users"></i>
+                                <span>${currentCar.seats} Seats</span>
+                            </div>
+                            <div class="spec-item">
+                                <i class="fas fa-cog"></i>
+                                <span>${currentCar.transmission}</span>
+                            </div>
+                            <div class="spec-item">
+                                <i class="fas fa-gas-pump"></i>
+                                <span>${currentCar.fuel}</span>
+                            </div>
+                            <div class="spec-item">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>Full Insurance</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p style="color: var(--text-muted); margin: 2rem 0;">${currentCar.description}</p>
+                    
+                    <div class="booking-form">
+                        <h3>Book This Car</h3>
+                        <form onsubmit="handleBookingSubmit(event)">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Pickup Date</label>
+                                    <input type="date" id="pickupDate" required min="${new Date().toISOString().split('T')[0]}">
+                                </div>
+                                <div class="form-group">
+                                    <label>Return Date</label>
+                                    <input type="date" id="returnDate" required min="${new Date().toISOString().split('T')[0]}">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Pickup Location</label>
+                                <select id="pickupLocation" required>
+                                    <option value="">Select Location</option>
+                                    <option value="Downtown">Downtown Office</option>
+                                    <option value="Airport">Airport Terminal</option>
+                                    <option value="North">North Branch</option>
+                                    <option value="South">South Branch</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Driver Option</label>
+                                <div class="driver-option">
+                                    <input type="radio" name="driver" id="self" value="self" checked>
+                                    <label for="self">Self Drive</label>
+                                    <input type="radio" name="driver" id="withDriver" value="with-driver">
+                                    <label for="withDriver">With Driver (+$50/day)</label>
+                                </div>
+                            </div>
+                            <div class="booking-summary">
+                                <div class="summary-row">
+                                    <span>Daily Rate:</span>
+                                    <span>$${currentCar.price}</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>Number of Days:</span>
+                                    <span id="numDays">0</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>Driver Fee:</span>
+                                    <span id="driverFee">$0</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>Total Amount:</span>
+                                    <span id="totalAmount">$0</span>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">
+                                <i class="fas fa-calendar-check"></i> Proceed to Payment
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            `;
+            
+            showSection('car-details');
+            
+            // Setup booking form listeners
+            document.getElementById('pickupDate').addEventListener('change', calculateTotal);
+            document.getElementById('returnDate').addEventListener('change', calculateTotal);
+            document.querySelectorAll('input[name="driver"]').forEach(radio => {
+                radio.addEventListener('change', calculateTotal);
+            });
+        }
+
+        function calculateTotal() {
+            const pickupDate = new Date(document.getElementById('pickupDate').value);
+            const returnDate = new Date(document.getElementById('returnDate').value);
+            
+            if (!pickupDate || !returnDate || returnDate <= pickupDate) {
+                return;
+            }
+            
+            const days = Math.ceil((returnDate - pickupDate) / (1000 * 60 * 60 * 24));
+            const driverOption = document.querySelector('input[name="driver"]:checked').value;
+            const driverFee = driverOption === 'with-driver' ? 50 : 0;
+            
+            const subtotal = currentCar.price * days;
+            const totalDriverFee = driverFee * days;
+            const total = subtotal + totalDriverFee;
+            
+            document.getElementById('numDays').textContent = days;
+            document.getElementById('driverFee').textContent = '$' + totalDriverFee;
+            document.getElementById('totalAmount').textContent = '$' + total;
+        }
+
+        function handleBookingSubmit(e) {
+            e.preventDefault();
+            
+            if (!currentUser) {
+                openAuthModal('login');
+                return;
+            }
+            
+            const pickupDate = document.getElementById('pickupDate').value;
+            const returnDate = document.getElementById('returnDate').value;
+            const pickupLocation = document.getElementById('pickupLocation').value;
+            const driverOption = document.querySelector('input[name="driver"]:checked').value;
+            
+            const days = Math.ceil((new Date(returnDate) - new Date(pickupDate)) / (1000 * 60 * 60 * 24));
+            const driverFee = driverOption === 'with-driver' ? 50 : 0;
+            const total = (currentCar.price * days) + (driverFee * days);
+            
+            currentBooking = {
+                carId: currentCar.id,
+                carName: currentCar.name,
+                carImage: currentCar.image,
+                pickupDate,
+                returnDate,
+                pickupLocation,
+                driverOption,
+                days,
+                total,
+                userId: currentUser.id
+            };
+            
+            // Show payment page
+            renderPaymentPage();
+            showSection('payment');
+        }
+
+        // ===== Payment =====
+        function renderPaymentPage() {
+            const summaryContainer = document.getElementById('paymentSummary');
+            
+            summaryContainer.innerHTML = `
+                <h3>Booking Summary</h3>
+                <div class="booking-summary">
+                    <div class="summary-row">
+                        <span>Car:</span>
+                        <span>${currentBooking.carName}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Pickup Date:</span>
+                        <span>${new Date(currentBooking.pickupDate).toLocaleDateString()}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Return Date:</span>
+                        <span>${new Date(currentBooking.returnDate).toLocaleDateString()}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Location:</span>
+                        <span>${currentBooking.pickupLocation}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Duration:</span>
+                        <span>${currentBooking.days} Days</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Driver:</span>
+                        <span>${currentBooking.driverOption === 'with-driver' ? 'With Driver' : 'Self Drive'}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Total Amount:</span>
+                        <span>$${currentBooking.total}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function handlePayment(e) {
+            e.preventDefault();
+            
+            const cardNumber = document.getElementById('cardNumber').value;
+            const cardHolder = document.getElementById('cardHolder').value;
+            const expiryDate = document.getElementById('expiryDate').value;
+            const cvv = document.getElementById('cvv').value;
+            
+            // Validate card number (basic check)
+            if (cardNumber.replace(/\s/g, '').length !== 16) {
+                showNotification('Invalid card number', 'error');
+                return;
+            }
+            
+            // Validate expiry date
+            const [month, year] = expiryDate.split('/');
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear() % 100;
+            const currentMonth = currentDate.getMonth() + 1;
+            
+            if (!month || !year || parseInt(month) > 12 || parseInt(month) < 1) {
+                showNotification('Invalid expiry date', 'error');
+                return;
+            }
+            
+            if (parseInt(year) < currentYear || (parseInt(year) === currentYear && parseInt(month) < currentMonth)) {
+                showNotification('Card has expired', 'error');
+                return;
+            }
+            
+            // Validate CVV
+            if (cvv.length !== 3) {
+                showNotification('Invalid CVV', 'error');
+                return;
+            }
+            
+            // Show loading
+            showLoading();
+            
+            // Simulate payment processing
+            setTimeout(() => {
+                // Save booking
+                const booking = {
+                    id: Date.now(),
+                    ...currentBooking,
+                    status: 'confirmed',
+                    bookingDate: new Date().toISOString()
+                };
+                
+                const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+                bookings.push(booking);
+                localStorage.setItem('bookings', JSON.stringify(bookings));
+                
+                hideLoading();
+                showSuccessModal();
+                
+                // Reset form
+                document.getElementById('paymentForm').reset();
+            }, 2000);
+        }
+
+        // ===== Bookings Dashboard =====
+        function renderBookings() {
+            const container = document.getElementById('bookingsContainer');
+            const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+            const userBookings = bookings.filter(b => b.userId === currentUser.id);
+            
+            if (userBookings.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-times"></i>
+                        <h3>No bookings yet</h3>
+                        <p>Start your journey by booking a car</p>
+                        <a href="#cars" class="btn btn-primary" onclick="showSection('cars')">
+                            Browse Cars
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = userBookings.map(booking => {
+                const car = carsData.find(c => c.id === booking.carId);
+                return `
+                    <div class="booking-card">
+                        <div class="booking-image">
+                            <img src="${booking.carImage}" alt="${booking.carName}">
+                        </div>
+                        <div class="booking-details">
+                            <h3>${booking.carName}</h3>
+                            <div class="booking-info">
+                                <div class="info-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>${new Date(booking.pickupDate).toLocaleDateString()} - ${new Date(booking.returnDate).toLocaleDateString()}</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>${booking.pickupLocation}</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>${booking.days} Days</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-dollar-sign"></i>
+                                    <span>$${booking.total}</span>
+                                </div>
+                            </div>
+                            <div class="booking-status ${booking.status === 'confirmed' ? 'status-confirmed' : 'status-pending'}">
+                                ${booking.status.toUpperCase()}
+                            </div>
+                        </div>
+                        <div class="booking-actions">
+                            <button class="btn-edit" onclick="editBooking(${booking.id})">
+                                <i class="fas fa-edit"></i> Modify
+                            </button>
+                            <button class="btn-cancel" onclick="cancelBooking(${booking.id})">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function editBooking(bookingId) {
+            const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+            const booking = bookings.find(b => b.id === bookingId);
+            
+            if (booking) {
+                currentCar = carsData.find(c => c.id === booking.carId);
+                showCarDetails(booking.carId);
+                
+                // Pre-fill form
+                setTimeout(() => {
+                    document.getElementById('pickupDate').value = booking.pickupDate;
+                    document.getElementById('returnDate').value = booking.returnDate;
+                    document.getElementById('pickupLocation').value = booking.pickupLocation;
+                    document.querySelector(`input[value="${booking.driverOption}"]`).checked = true;
+                    calculateTotal();
+                }, 100);
+                
+                // Remove old booking
+                cancelBooking(bookingId, true);
+            }
+        }
+
+        function cancelBooking(bookingId, silent = false) {
+            if (!silent && !confirm('Are you sure you want to cancel this booking?')) {
+                return;
+            }
+            
+            const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+            const updatedBookings = bookings.filter(b => b.id !== bookingId);
+            localStorage.setItem('bookings', JSON.stringify(updatedBookings));
+            
+            if (!silent) {
+                showNotification('Booking cancelled successfully', 'success');
+                renderBookings();
+            }
+        }
+
+        // ===== Utilities =====
+        function formatCardNumber(e) {
+            let value = e.target.value.replace(/\s/g, '');
+            let formatted = value.match(/.{1,4}/g)?.join(' ') || value;
+            e.target.value = formatted;
+        }
+
+        function formatExpiryDate(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.slice(0, 2) + '/' + value.slice(2, 4);
+            }
+            e.target.value = value;
+        }
+
+        function formatCVV(e) {
+            e.target.value = e.target.value.replace(/\D/g, '').slice(0, 3);
+        }
+
+        function showNotification(message, type) {
+            alert(message);
+        }
+
+        function showLoading() {
+            document.getElementById('loadingOverlay').classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.add('hidden');
+        }
+ṇ
+        function showSuccessModal() {
+            const modal = document.getElementById('successModal');
+            const message = document.getElementById('successMessage');
+            
+            message.textContent = `Your booking has been confirmed! Confirmation details have been sent to ${currentUser.email}`;
+            modal.classList.remove('hidden');
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.add('hidden');
+            showSection('dashboard');
+        }
+
+        function toggleDarkMode() {
+            const body = document.body;
+            const toggle = document.getElementById('darkModeToggle');
+            
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+                toggle.innerHTML = '<i class="fas fa-moon"></i>';
+                localStorage.setItem('darkMode', 'false');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                toggle.innerHTML = '<i class="fas fa-sun"></i>';
+                localStorage.setItem('darkMode', 'true');
+            }
+        }
+    </script>
+</body>
+</html>
