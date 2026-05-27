@@ -25,14 +25,6 @@ A simple and efficient Car Rental System built to manage car bookings, customers
 - CSS
 - JavaScript
 
-### Backend
-- Node.js / Java / Python / PHP
-
-### Database
-- MySQL / MongoDB
-
----
-
 ## 📂 Project Structure
 
 ```bash
@@ -52,7 +44,7 @@ Car-Rental-System/
 ### Clone Repository
 
 ```bash
-git clone https://github.com/your-username/car-rental-system.git
+git clone https://github.com/Adityasanu/car-rental-system.git
 ```
 
 ### Install Dependencies
